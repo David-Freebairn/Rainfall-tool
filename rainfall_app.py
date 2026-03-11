@@ -13,227 +13,236 @@ import urllib.parse
 from io import StringIO
 from datetime import datetime, date
 
-# ── page config ───────────────────────────────────────────────────────────────
 st.set_page_config(
     page_title="Rainfall Analysis",
     page_icon="🌧️",
     layout="wide",
 )
 
-# ── custom CSS ────────────────────────────────────────────────────────────────
 st.markdown("""
 <style>
-@import url('https://fonts.googleapis.com/css2?family=DM+Sans:wght@300;400;500;600&family=DM+Mono:wght@400;500&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Syne:wght@700;800&family=DM+Sans:wght@400;500;600&family=DM+Mono:wght@400;500&display=swap');
 
-/* ── global reset ── */
-html, body, [class*="css"] {
-    font-family: 'DM Sans', sans-serif;
-}
+html, body, [class*="css"] { font-family: 'DM Sans', sans-serif; }
 
-/* ── app background ── */
-.stApp {
-    background-color: #f0f4f8;
-}
+.stApp { background-color: #eef2f7; }
 
-/* ── hide default streamlit chrome ── */
 #MainMenu, footer, header { visibility: hidden; }
 .block-container {
-    padding-top: 2rem;
-    padding-bottom: 3rem;
-    max-width: 1200px;
+    padding-top: 1.2rem;
+    padding-bottom: 1.5rem;
+    max-width: 1280px;
 }
 
-/* ── custom header banner ── */
+/* ── header ── */
 .app-header {
-    background: #0f2744;
-    border-radius: 12px;
-    padding: 2rem 2.5rem;
-    margin-bottom: 2rem;
+    background: #0b1f3a;
+    border-radius: 10px;
+    padding: 1.1rem 2rem;
+    margin-bottom: 1.2rem;
     display: flex;
     align-items: center;
-    gap: 1.2rem;
+    justify-content: space-between;
 }
-.app-header-icon {
-    font-size: 2.4rem;
-    line-height: 1;
-}
+.app-header-left { display: flex; align-items: center; gap: 1rem; }
+.app-header-icon { font-size: 2rem; line-height: 1; }
 .app-header-title {
     color: #ffffff;
-    font-size: 1.7rem;
-    font-weight: 600;
-    letter-spacing: -0.02em;
+    font-family: 'Syne', sans-serif;
+    font-size: 1.55rem;
+    font-weight: 800;
+    letter-spacing: -0.03em;
     margin: 0;
+    line-height: 1.1;
 }
 .app-header-sub {
-    color: #7ea8cc;
-    font-size: 0.85rem;
-    font-weight: 400;
-    margin: 0;
-    font-family: 'DM Mono', monospace;
-    letter-spacing: 0.04em;
-    text-transform: uppercase;
-}
-
-/* ── section cards ── */
-.section-card {
-    background: #ffffff;
-    border: 1px solid #dde5ee;
-    border-radius: 10px;
-    padding: 1.6rem 2rem;
-    margin-bottom: 1.5rem;
-    box-shadow: 0 1px 4px rgba(15,39,68,0.06);
-}
-.section-label {
+    color: #5d8ab0;
     font-size: 0.72rem;
-    font-weight: 600;
+    font-family: 'DM Mono', monospace;
     letter-spacing: 0.1em;
     text-transform: uppercase;
-    color: #7ea8cc;
-    font-family: 'DM Mono', monospace;
-    margin-bottom: 0.2rem;
+    margin: 0;
 }
-.section-title {
-    font-size: 1.1rem;
-    font-weight: 600;
-    color: #0f2744;
-    margin-bottom: 1.2rem;
+.app-header-badge {
+    background: #1a3a5c;
+    color: #7eb8e8;
+    font-family: 'DM Mono', monospace;
+    font-size: 0.7rem;
+    padding: 0.3rem 0.8rem;
+    border-radius: 20px;
+    letter-spacing: 0.08em;
+    border: 1px solid #2a5a8c;
+}
+
+/* ── step panels ── */
+.step-panel {
+    background: #ffffff;
+    border: 1px solid #d5dfe9;
+    border-radius: 10px;
+    padding: 1rem 1.4rem 1.2rem;
+    margin-bottom: 1rem;
+    box-shadow: 0 1px 3px rgba(11,31,58,0.07);
+}
+.step-header {
+    display: flex;
+    align-items: baseline;
+    gap: 0.7rem;
+    margin-bottom: 0.9rem;
+    border-bottom: 2px solid #eef2f7;
+    padding-bottom: 0.6rem;
+}
+.step-num {
+    font-family: 'DM Mono', monospace;
+    font-size: 0.68rem;
+    font-weight: 500;
+    color: #2979c4;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    background: #e8f0fb;
+    padding: 0.18rem 0.55rem;
+    border-radius: 4px;
+}
+.step-title {
+    font-family: 'Syne', sans-serif;
+    font-size: 1rem;
+    font-weight: 700;
+    color: #0b1f3a;
     letter-spacing: -0.01em;
 }
 
 /* ── stat chips ── */
-.stat-row {
-    display: flex;
-    gap: 1rem;
-    flex-wrap: wrap;
-    margin-top: 1rem;
-}
+.stat-row { display: flex; gap: 0.6rem; flex-wrap: wrap; margin-top: 0.7rem; }
 .stat-chip {
-    background: #eef3f9;
-    border: 1px solid #d0dcea;
-    border-radius: 8px;
-    padding: 0.55rem 1rem;
-    font-size: 0.82rem;
-    color: #0f2744;
+    background: #f0f5fc;
+    border: 1px solid #c8d8ec;
+    border-radius: 6px;
+    padding: 0.38rem 0.75rem;
+    font-size: 0.78rem;
+    color: #3a5a7a;
     font-family: 'DM Mono', monospace;
 }
-.stat-chip span {
-    font-weight: 600;
-    color: #1a5fa8;
-}
+.stat-chip b { color: #0b1f3a; font-weight: 600; }
 
-/* ── divider ── */
-.section-divider {
-    border: none;
-    border-top: 1px solid #dde5ee;
-    margin: 1.5rem 0;
+/* ── result highlight ── */
+.result-banner {
+    background: #0b1f3a;
+    border-radius: 8px;
+    padding: 0.75rem 1.2rem;
+    margin: 0.8rem 0;
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    flex-wrap: wrap;
+}
+.result-banner .rb-label {
+    font-family: 'DM Mono', monospace;
+    font-size: 0.72rem;
+    color: #5d8ab0;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+}
+.result-banner .rb-value {
+    font-family: 'Syne', sans-serif;
+    font-size: 1.4rem;
+    font-weight: 800;
+    color: #ffffff;
+    letter-spacing: -0.02em;
+    line-height: 1;
+}
+.result-banner .rb-pct {
+    font-family: 'Syne', sans-serif;
+    font-size: 2rem;
+    font-weight: 800;
+    color: #4da6ff;
+    letter-spacing: -0.03em;
+    margin-left: auto;
 }
 
 /* ── inputs ── */
 .stTextInput > div > div > input,
 .stNumberInput > div > div > input {
-    border: 1px solid #c8d8e8 !important;
-    border-radius: 7px !important;
+    border: 1px solid #c0d0e0 !important;
+    border-radius: 6px !important;
     background: #f7fafd !important;
     font-family: 'DM Sans', sans-serif !important;
-    color: #0f2744 !important;
-    font-size: 0.9rem !important;
-    padding: 0.5rem 0.75rem !important;
+    color: #0b1f3a !important;
+    font-size: 0.88rem !important;
 }
 .stTextInput > div > div > input:focus,
 .stNumberInput > div > div > input:focus {
-    border-color: #1a5fa8 !important;
-    box-shadow: 0 0 0 3px rgba(26,95,168,0.12) !important;
+    border-color: #2979c4 !important;
+    box-shadow: 0 0 0 3px rgba(41,121,196,0.14) !important;
 }
 .stSelectbox > div > div {
-    border: 1px solid #c8d8e8 !important;
-    border-radius: 7px !important;
+    border: 1px solid #c0d0e0 !important;
+    border-radius: 6px !important;
     background: #f7fafd !important;
-    font-family: 'DM Sans', sans-serif !important;
-    color: #0f2744 !important;
+    font-size: 0.88rem !important;
 }
 .stDateInput > div > div > input {
-    border: 1px solid #c8d8e8 !important;
-    border-radius: 7px !important;
+    border: 1px solid #c0d0e0 !important;
+    border-radius: 6px !important;
     background: #f7fafd !important;
+    font-size: 0.88rem !important;
 }
-
-/* ── labels ── */
 label, .stSelectbox label, .stTextInput label,
 .stNumberInput label, .stDateInput label {
-    font-size: 0.82rem !important;
-    font-weight: 500 !important;
-    color: #4a6580 !important;
-    letter-spacing: 0.01em !important;
-    margin-bottom: 0.15rem !important;
+    font-size: 0.78rem !important;
+    font-weight: 600 !important;
+    color: #3a5a7a !important;
+    letter-spacing: 0.02em !important;
+    text-transform: uppercase !important;
 }
 
 /* ── buttons ── */
 .stButton > button {
-    border-radius: 7px !important;
+    border-radius: 6px !important;
     font-family: 'DM Sans', sans-serif !important;
-    font-weight: 500 !important;
-    font-size: 0.88rem !important;
-    padding: 0.5rem 1.2rem !important;
-    transition: all 0.15s ease !important;
-    border: 1px solid #c8d8e8 !important;
+    font-weight: 600 !important;
+    font-size: 0.86rem !important;
+    padding: 0.45rem 1.1rem !important;
+    border: 1px solid #c0d0e0 !important;
     background: #ffffff !important;
-    color: #0f2744 !important;
+    color: #0b1f3a !important;
+    transition: all 0.12s ease !important;
 }
 .stButton > button:hover {
-    background: #eef3f9 !important;
-    border-color: #1a5fa8 !important;
-    color: #1a5fa8 !important;
+    background: #eef2f7 !important;
+    border-color: #2979c4 !important;
+    color: #2979c4 !important;
 }
 .stButton > button[kind="primary"] {
-    background: #0f2744 !important;
+    background: #0b1f3a !important;
     color: #ffffff !important;
-    border-color: #0f2744 !important;
+    border-color: #0b1f3a !important;
+    font-size: 0.9rem !important;
+    padding: 0.55rem 1.6rem !important;
+    letter-spacing: 0.02em;
 }
 .stButton > button[kind="primary"]:hover {
-    background: #1a5fa8 !important;
-    border-color: #1a5fa8 !important;
-    color: #ffffff !important;
+    background: #2979c4 !important;
+    border-color: #2979c4 !important;
 }
 
 /* ── alerts ── */
-.stSuccess {
-    border-radius: 8px !important;
-    border-left: 4px solid #2e8b57 !important;
-    background: #f0faf4 !important;
-    font-family: 'DM Sans', sans-serif !important;
-}
-.stInfo {
-    border-radius: 8px !important;
-    border-left: 4px solid #1a5fa8 !important;
-    background: #eef3f9 !important;
-}
-.stWarning {
-    border-radius: 8px !important;
-    border-left: 4px solid #c8811a !important;
-}
-.stError {
-    border-radius: 8px !important;
-    border-left: 4px solid #c0392b !important;
+div[data-testid="stAlert"] {
+    border-radius: 7px !important;
+    font-size: 0.88rem !important;
 }
 
-/* ── download button ── */
+/* ── download btn ── */
 .stDownloadButton > button {
-    border-radius: 7px !important;
+    border-radius: 6px !important;
     font-family: 'DM Mono', monospace !important;
-    font-size: 0.82rem !important;
-    background: #f0f4f8 !important;
-    border: 1px dashed #a0b8cc !important;
-    color: #0f2744 !important;
-    letter-spacing: 0.02em !important;
+    font-size: 0.78rem !important;
+    background: #f0f5fc !important;
+    border: 1px dashed #94b4d4 !important;
+    color: #0b1f3a !important;
 }
 .stDownloadButton > button:hover {
-    background: #dde5ee !important;
-    border-color: #1a5fa8 !important;
+    background: #dde8f5 !important;
+    border-color: #2979c4 !important;
 }
-
-/* ── subheader overrides ── */
-h2 { color: #0f2744 !important; font-weight: 600 !important; letter-spacing: -0.02em !important; }
-h3 { color: #0f2744 !important; font-weight: 500 !important; font-size: 0.95rem !important; }
 </style>
 """, unsafe_allow_html=True)
 
@@ -348,138 +357,135 @@ def season_label(sm, sd, em, ed):
 
 
 # ── session state ─────────────────────────────────────────────────────────────
-if "df" not in st.session_state:
-    st.session_state.df = None
-if "station_name" not in st.session_state:
-    st.session_state.station_name = None
-if "stations" not in st.session_state:
-    st.session_state.stations = []
+for key in ("df", "station_name", "stations"):
+    if key not in st.session_state:
+        st.session_state[key] = None if key != "stations" else []
 
 # ── header ────────────────────────────────────────────────────────────────────
 st.markdown("""
 <div class="app-header">
-  <div class="app-header-icon">🌧️</div>
-  <div>
-    <p class="app-header-title">Rainfall Analysis Tool</p>
-    <p class="app-header-sub">Australian SILO Climate Data · Rolling Window Frequency Analysis</p>
+  <div class="app-header-left">
+    <div class="app-header-icon">🌧️</div>
+    <div>
+      <p class="app-header-title">What are the odds-rain?</p>
+      <p class="app-header-sub">Australian SILO Data · Rainfall Between Two Dates</p>
+    </div>
+  </div>
+  <div class="app-header-badge">SILO API</div>
+</div>
+""", unsafe_allow_html=True)
+
+# ══════════════════════════════════════════════════════════════════════════════
+# STEP 1
+# ══════════════════════════════════════════════════════════════════════════════
+st.markdown("""
+<div class="step-panel">
+  <div class="step-header">
+    <span class="step-num">Step 01</span>
+    <span class="step-title">Connect & Load Station Data</span>
   </div>
 </div>
 """, unsafe_allow_html=True)
 
-# ══════════════════════════════════════════════════════════════════════════════
-# STEP 1 — FETCH DATA
-# ══════════════════════════════════════════════════════════════════════════════
-st.markdown("""
-<div class="section-card">
-  <p class="section-label">Step 01</p>
-  <p class="section-title">Connect to SILO & Load Station Data</p>
-</div>
-""", unsafe_allow_html=True)
+with st.container():
+    c1, c2, c3, c4 = st.columns([2, 2, 1.2, 1.2])
+    with c1:
+        email = st.text_input("Email address", placeholder="you@example.com",
+                              help="Required by SILO as an API key.")
+    with c2:
+        search_term = st.text_input("Search station", placeholder="e.g. Cairns, Townsville")
+    with c3:
+        start_date = st.date_input("Start date", value=date(1990, 1, 1), min_value=date(1889, 1, 1))
+    with c4:
+        end_date = st.date_input("End date", value=date.today())
 
-col1, col2 = st.columns([1, 1])
-with col1:
-    email = st.text_input(
-        "Email address",
-        placeholder="you@example.com",
-        help="Required by SILO as an API key per their terms of use."
-    )
-with col2:
-    search_term = st.text_input(
-        "Search station",
-        placeholder="e.g. Cairns, Townsville, Darwin",
-        help="Enter part of a station name to search"
-    )
+    if st.button("🔍  Search Stations", disabled=not (email and search_term)):
+        if "@" not in email:
+            st.error("Please enter a valid email address.")
+        else:
+            with st.spinner(f"Searching for '{search_term}'…"):
+                try:
+                    stations = silo_search(search_term, email)
+                    st.session_state.stations = stations
+                    if not stations:
+                        st.warning("No stations found. Try a shorter term.")
+                except Exception as e:
+                    st.error(f"Search failed: {e}")
 
-col_date1, col_date2, col_gap = st.columns([1, 1, 1])
-with col_date1:
-    start_date = st.date_input("Start date", value=date(1990, 1, 1), min_value=date(1889, 1, 1))
-with col_date2:
-    end_date = st.date_input("End date", value=date.today())
+    if st.session_state.stations:
+        sc1, sc2 = st.columns([3, 1])
+        with sc1:
+            labels = [s["label"] for s in st.session_state.stations]
+            selected_label = st.selectbox(f"Select station ({len(st.session_state.stations)} found)", labels)
+            selected_station = next(s for s in st.session_state.stations if s["label"] == selected_label)
+        with sc2:
+            st.write("")
+            st.write("")
+            fetch = st.button("⬇️  Fetch Data", type="primary")
 
-st.write("")
-if st.button("🔍  Search Stations", disabled=not (email and search_term)):
-    if "@" not in email:
-        st.error("Please enter a valid email address.")
-    else:
-        with st.spinner(f"Searching for stations matching '{search_term}'…"):
-            try:
-                stations = silo_search(search_term, email)
-                st.session_state.stations = stations
-                if not stations:
-                    st.warning("No stations found. Try a shorter term (e.g. 'Cairn' instead of 'Cairns Airport').")
-            except Exception as e:
-                st.error(f"Search failed: {e}")
-
-# Station picker
-if st.session_state.stations:
-    st.markdown("<hr class='section-divider'>", unsafe_allow_html=True)
-    st.success(f"**{len(st.session_state.stations)}** station(s) found")
-    labels = [s["label"] for s in st.session_state.stations]
-    selected_label = st.selectbox("Select a station", labels)
-    selected_station = next(s for s in st.session_state.stations if s["label"] == selected_label)
-
-    st.write("")
-    if st.button("⬇️  Fetch Rainfall Data"):
-        start_str = start_date.strftime("%Y%m%d")
-        end_str   = end_date.strftime("%Y%m%d")
-        with st.spinner(f"Fetching data for {selected_station['name']}…"):
-            try:
-                raw = silo_fetch(selected_station["id"], start_str, end_str, email)
-                df  = parse_silo(raw)
-                st.session_state.df = df
-                st.session_state.station_name = selected_station["name"]
-                years = df["year"].unique()
-                ann_mean = df.groupby("year")["rain"].sum().mean()
-                st.success(f"Data loaded for **{selected_station['name']}**")
-                st.markdown(f"""
-                <div class="stat-row">
-                  <div class="stat-chip">Records &nbsp;<span>{len(df):,} days</span></div>
-                  <div class="stat-chip">Period &nbsp;<span>{years.min()}–{years.max()}</span></div>
-                  <div class="stat-chip">Annual mean &nbsp;<span>{ann_mean:.1f} mm</span></div>
-                </div>
-                """, unsafe_allow_html=True)
-            except Exception as e:
-                st.error(f"Fetch failed: {e}")
-
-st.write("")
+        if fetch:
+            with st.spinner(f"Fetching data for {selected_station['name']}…"):
+                try:
+                    raw = silo_fetch(selected_station["id"],
+                                     start_date.strftime("%Y%m%d"),
+                                     end_date.strftime("%Y%m%d"), email)
+                    df  = parse_silo(raw)
+                    st.session_state.df = df
+                    st.session_state.station_name = selected_station["name"]
+                    years    = df["year"].unique()
+                    ann_mean = df.groupby("year")["rain"].sum().mean()
+                    ann_max  = df.groupby("year")["rain"].sum().max()
+                    st.success(f"✅ Loaded **{selected_station['name']}**")
+                    st.markdown(f"""
+                    <div class="stat-row">
+                      <div class="stat-chip"><b>{len(df):,}</b> days</div>
+                      <div class="stat-chip"><b>{years.min()}–{years.max()}</b> period</div>
+                      <div class="stat-chip">Annual mean <b>{ann_mean:.0f} mm</b></div>
+                      <div class="stat-chip">Annual max <b>{ann_max:.0f} mm</b></div>
+                    </div>
+                    """, unsafe_allow_html=True)
+                except Exception as e:
+                    st.error(f"Fetch failed: {e}")
 
 # ══════════════════════════════════════════════════════════════════════════════
-# STEP 2 — ROLLING WINDOW ANALYSIS
+# STEP 2
 # ══════════════════════════════════════════════════════════════════════════════
 st.markdown("""
-<div class="section-card">
-  <p class="section-label">Step 02</p>
-  <p class="section-title">Rolling Window Frequency Analysis</p>
+<div class="step-panel">
+  <div class="step-header">
+    <span class="step-num">Step 02</span>
+    <span class="step-title">Rolling Window Analysis</span>
+  </div>
 </div>
 """, unsafe_allow_html=True)
 
 if st.session_state.df is None:
-    st.info("Complete Step 1 above to enable analysis.")
+    st.info("Complete Step 1 to enable analysis.")
 else:
-    df = st.session_state.df
+    df    = st.session_state.df
     years = sorted(df["year"].unique())
 
-    col_a, col_b, col_c = st.columns(3)
+    ca, cb, cc, cd = st.columns([1.2, 1.2, 1, 1])
 
-    with col_a:
-        st.markdown("**Season window**")
-        sc1, sc2 = st.columns(2)
-        with sc1:
-            start_day = st.selectbox("Start day",   list(range(1, 32)), index=0,  key="sd")
-            start_mon = st.selectbox("Start month", MONTHS,             index=0,  key="sm")
-        with sc2:
-            end_day   = st.selectbox("End day",     list(range(1, 32)), index=30, key="ed")
-            end_mon   = st.selectbox("End month",   MONTHS,             index=11, key="em")
+    with ca:
+        st.markdown("**Season start**")
+        s1, s2 = st.columns(2)
+        with s1: start_day = st.selectbox("Day",   list(range(1,32)), index=0,  key="sd")
+        with s2: start_mon = st.selectbox("Month", MONTHS,            index=0,  key="sm")
 
-    with col_b:
-        st.markdown("**Threshold criteria**")
-        threshold = st.number_input("Rainfall (mm) ≥", min_value=1.0,   value=100.0, step=10.0)
-        win_days  = st.number_input("Within (days)",   min_value=1,     value=30,    step=1)
+    with cb:
+        st.markdown("**Season end**")
+        e1, e2 = st.columns(2)
+        with e1: end_day = st.selectbox("Day",   list(range(1,32)), index=30, key="ed")
+        with e2: end_mon = st.selectbox("Month", MONTHS,            index=11, key="em")
 
-    with col_c:
-        st.markdown("**Year range**")
-        yr_from = st.selectbox("From", years, index=0)
-        yr_to   = st.selectbox("To",   years, index=len(years)-1)
+    with cc:
+        threshold = st.number_input("Rainfall (mm) ≥", min_value=1.0, value=100.0, step=10.0)
+        win_days  = st.number_input("Within (days)",   min_value=1,   value=30,    step=1)
+
+    with cd:
+        yr_from = st.selectbox("Year from", years, index=0)
+        yr_to   = st.selectbox("Year to",   years, index=len(years)-1)
 
     st.write("")
     if st.button("▶  Run Analysis", type="primary"):
@@ -493,21 +499,18 @@ else:
             sub = sub[(sub["season_year"] >= yr_from) & (sub["season_year"] <= yr_to)]
 
             if sub.empty:
-                st.warning("No data found for that season/year range.")
+                st.warning("No data in that season/year range.")
             else:
                 results = []
                 for sy, grp in sub.sort_values("date").groupby("season_year"):
                     rolled = grp["rain"].rolling(window=int(win_days), min_periods=int(win_days)).sum()
                     mx = rolled.max()
                     if not np.isnan(mx):
-                        results.append({
-                            "season_year": sy,
-                            "max_roll_mm": mx,
-                            "met_criteria": int(mx >= threshold)
-                        })
+                        results.append({"season_year": sy, "max_roll_mm": mx,
+                                        "met_criteria": int(mx >= threshold)})
 
                 if not results:
-                    st.warning("Not enough days to compute the rolling window.")
+                    st.warning("Not enough days to compute rolling window.")
                 else:
                     annual_max = pd.DataFrame(results)
                     rain       = annual_max["max_roll_mm"].values
@@ -515,93 +518,100 @@ else:
                     n_exceed   = int(np.sum(rain >= threshold))
                     pct        = n_exceed / n * 100
 
-                    # ── result summary chips ───────────────────────────────────
-                    st.markdown("<hr class='section-divider'>", unsafe_allow_html=True)
+                    station = st.session_state.station_name or "Station"
+
+                    # ── result banner ──────────────────────────────────────────
                     st.markdown(f"""
-                    <div class="stat-row">
-                      <div class="stat-chip">Criterion &nbsp;<span>{threshold:.0f} mm in {int(win_days)} days</span></div>
-                      <div class="stat-chip">Season &nbsp;<span>{slabel}</span></div>
-                      <div class="stat-chip">Years assessed &nbsp;<span>{n}</span></div>
-                      <div class="stat-chip">Years exceeded &nbsp;<span>{n_exceed}</span></div>
-                      <div class="stat-chip">Exceedance frequency &nbsp;<span>{pct:.1f}%</span></div>
+                    <div class="result-banner">
+                      <div>
+                        <div class="rb-label">Exceedance frequency</div>
+                        <div class="rb-value">{n_exceed} of {n} years exceeded {threshold:.0f} mm in {int(win_days)} days</div>
+                      </div>
+                      <div class="rb-pct">{pct:.1f}%</div>
                     </div>
                     """, unsafe_allow_html=True)
-                    st.write("")
 
-                    # ── chart ─────────────────────────────────────────────────
-                    NAVY    = "#0f2744"
-                    BLUE    = "#1a5fa8"
-                    MISS    = "#c8d8e8"
-                    BG      = "#f7fafd"
-                    GRID    = "#dde5ee"
+                    # ── chart ──────────────────────────────────────────────────
+                    NAVY   = "#0b1f3a"
+                    BLUE   = "#2979c4"
+                    BRIGHT = "#4da6ff"
+                    MISS   = "#b8cfe8"
+                    BG     = "#f7fafd"
+                    GRID   = "#dde5ee"
 
-                    fig, ax = plt.subplots(figsize=(13, 4.8))
+                    fig, ax = plt.subplots(figsize=(14, 4.2))
                     fig.patch.set_facecolor(BG)
                     ax.set_facecolor(BG)
 
-                    colours = [NAVY if r >= threshold else MISS
+                    colours = [BRIGHT if r >= threshold else MISS
                                for r in annual_max["max_roll_mm"]]
+
                     bars = ax.bar(
                         annual_max["season_year"],
                         annual_max["max_roll_mm"],
                         color=colours, width=0.72, zorder=3,
-                        linewidth=0
+                        linewidth=0, alpha=0.95
                     )
 
-                    # threshold line
-                    ax.axhline(threshold, color=BLUE, lw=1.4, ls="--", zorder=4, alpha=0.85)
+                    for bar, r in zip(bars, annual_max["max_roll_mm"]):
+                        if r >= threshold:
+                            bar.set_edgecolor(BLUE)
+                            bar.set_linewidth(0.8)
+
+                    ax.axhline(threshold, color=NAVY, lw=1.8, ls="--", zorder=4)
                     ax.text(
                         annual_max["season_year"].max() + 0.5,
-                        threshold + rain.max() * 0.016,
-                        f"{threshold:.0f} mm threshold",
-                        color=BLUE, fontsize=9, va="bottom",
+                        threshold + rain.max() * 0.018,
+                        f"▶  {threshold:.0f} mm",
+                        color=NAVY, fontsize=9.5, va="bottom", fontweight="bold",
                         fontfamily="monospace"
                     )
 
-                    # axes
-                    ax.set_xlabel("Season year", fontsize=10, color="#4a6580", labelpad=8)
-                    ax.set_ylabel(f"Max {int(win_days)}-day Rainfall (mm)", fontsize=10, color="#4a6580", labelpad=8)
-                    ax.tick_params(colors="#4a6580", labelsize=9)
-                    ax.tick_params(axis="x", rotation=45 if n > 30 else 0)
+                    for _, row in annual_max[annual_max["max_roll_mm"] >= threshold].iterrows():
+                        ax.bar(row["season_year"], threshold,
+                               color=BLUE, width=0.72, zorder=3, alpha=0.3, linewidth=0)
 
-                    ax.grid(True, axis="y", color=GRID, lw=0.8, zorder=0)
+                    ax.set_xlabel("Season year", fontsize=10, color="#3a5a7a", labelpad=6)
+                    ax.set_ylabel(f"Max {int(win_days)}-day rainfall  (mm)",
+                                  fontsize=10, color="#3a5a7a", labelpad=6)
+                    ax.tick_params(colors="#3a5a7a", labelsize=9)
+                    if n > 30:
+                        ax.tick_params(axis="x", rotation=45)
+
+                    ax.grid(True, axis="y", color=GRID, lw=0.9, zorder=0)
                     ax.set_axisbelow(True)
-                    for sp in ax.spines.values():
-                        sp.set_color(GRID)
-                    ax.spines["top"].set_visible(False)
-                    ax.spines["right"].set_visible(False)
+                    for sp in ["top", "right", "left"]:
+                        ax.spines[sp].set_visible(False)
+                    ax.spines["bottom"].set_color(GRID)
 
-                    station = st.session_state.station_name or "Station"
                     ax.set_title(
-                        f"{station}   ·   {slabel}   ·   {int(win_days)}-day rolling window   ·   {yr_from}–{yr_to}",
-                        fontsize=11, fontweight="semibold", color=NAVY, pad=14
+                        f"{station}   ·   {slabel}   ·   {int(win_days)}-day window   ·   {yr_from}–{yr_to}",
+                        fontsize=11, fontweight="bold", color=NAVY, pad=10
                     )
 
                     from matplotlib.patches import Patch
                     ax.legend(
                         handles=[
-                            Patch(color=NAVY, label=f"≥ {threshold:.0f} mm  ({n_exceed} yrs)"),
-                            Patch(color=MISS, label=f"< {threshold:.0f} mm  ({n - n_exceed} yrs)"),
+                            Patch(color=BRIGHT, edgecolor=BLUE, linewidth=0.8,
+                                  label=f"≥ {threshold:.0f} mm  ({n_exceed} yrs)"),
+                            Patch(color=MISS, label=f"< {threshold:.0f} mm  ({n-n_exceed} yrs)"),
                         ],
                         fontsize=9, loc="upper left",
-                        framealpha=0.9, edgecolor=GRID,
-                        fancybox=False
+                        framealpha=0.95, edgecolor=GRID, fancybox=False
                     )
 
-                    fig.tight_layout()
+                    fig.tight_layout(pad=1.2)
                     st.pyplot(fig)
                     plt.close(fig)
 
-                    # ── download ──────────────────────────────────────────────
-                    st.write("")
+                    # ── export ────────────────────────────────────────────────
                     export = annual_max.copy()
                     export["window_days"]  = int(win_days)
                     export["threshold_mm"] = threshold
                     export["season"]       = slabel
-                    csv = export.to_csv(index=False)
                     st.download_button(
-                        "💾  Export results as CSV",
-                        data=csv,
+                        "💾  Export CSV",
+                        data=export.to_csv(index=False),
                         file_name=f"rolling_window_{station.replace(' ','_')}.csv",
                         mime="text/csv"
                     )
